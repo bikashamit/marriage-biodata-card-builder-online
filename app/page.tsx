@@ -1,7 +1,27 @@
 "use client";
 import { useState } from "react";
+import React from "react";
 
-const THEMES = {
+type ThemeKey = "rose" | "royal" | "emerald" | "saffron";
+
+interface Theme {
+  name: string; headerGrad: string; bg: string; accent: string;
+  accentSoft: string; border: string; label: string; text: string;
+  sub: string; divider: string; pattern: string; ornament: string;
+  sectionBg: string; cardShadow: string;
+}
+
+interface BiodataData {
+  name: string; dob: string; birthTime: string; birthplace: string;
+  height: string; weight: string; complexion: string; bloodGroup: string;
+  religion: string; caste: string; education: string; college: string;
+  occupation: string; company: string; income: string; fatherName: string;
+  fatherOcc: string; motherName: string; motherOcc: string; siblings: string;
+  address: string; phone: string; email: string; hobbies: string;
+  languages: string; photo: string; note: string;
+}
+
+const THEMES: Record<ThemeKey, Theme> = {
   rose: {
     name: "🌸 Rose",
     headerGrad: "linear-gradient(135deg, #c2185b 0%, #e91e63 50%, #ad1457 100%)",
@@ -40,7 +60,7 @@ const THEMES = {
   },
 };
 
-const defaultData = {
+const defaultData: BiodataData = {
   name: "Priya Sharma", dob: "1998-03-15", birthTime: "06:30 AM",
   birthplace: "Jaipur, Rajasthan", height: "5'4\"", weight: "52 kg",
   complexion: "Fair", bloodGroup: "B+", religion: "Hindu", caste: "Brahmin",
@@ -57,18 +77,18 @@ const defaultData = {
   note: "I am a simple, family-oriented person who values tradition and togetherness. Looking forward to beginning a beautiful journey with the right partner.",
 };
 
-function formatDate(d: string) {
+function formatDate(d: string): string {
   if (!d) return "";
   try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }); }
   catch (e) { return d; }
 }
 
-function calcAge(d: string) {
+function calcAge(d: string): string {
   if (!d) return "";
   return Math.floor((Date.now() - new Date(d).getTime()) / (365.25 * 24 * 3600 * 1000)) + " Yrs";
 }
 
-function Row({ label, value, tc }: { label: string; value: string; tc: any }) {
+function Row({ label, value, tc }: { label: string; value: string; tc: Theme }) {
   return (
     <div style={{ display: "flex", marginBottom: "5px", lineHeight: "1.5" }}>
       <span style={{ color: tc.label, fontWeight: 700, fontSize: "10.5px", minWidth: "120px", flexShrink: 0 }}>{label}</span>
@@ -77,18 +97,10 @@ function Row({ label, value, tc }: { label: string; value: string; tc: any }) {
   );
 }
 
-function CardSection({ icon, title, tc, children }: { icon: string; title: string; tc: any; children: React.ReactNode }) {
+function CardSection({ icon, title, tc, children }: { icon: string; title: string; tc: Theme; children: React.ReactNode }) {
   return (
-    <div style={{
-      background: tc.sectionBg, border: "1px solid " + tc.border,
-      borderRadius: "10px", padding: "12px 14px", marginBottom: "10px",
-    }}>
-      <div style={{
-        color: tc.accent, fontWeight: 800, fontSize: "10px", textTransform: "uppercase",
-        letterSpacing: "0.15em", marginBottom: "10px", paddingBottom: "7px",
-        borderBottom: "1.5px solid " + tc.divider,
-        display: "flex", alignItems: "center", gap: "6px",
-      }}>
+    <div style={{ background: tc.sectionBg, border: "1px solid " + tc.border, borderRadius: "10px", padding: "12px 14px", marginBottom: "10px" }}>
+      <div style={{ color: tc.accent, fontWeight: 800, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "10px", paddingBottom: "7px", borderBottom: "1.5px solid " + tc.divider, display: "flex", alignItems: "center", gap: "6px" }}>
         <span style={{ fontSize: "13px" }}>{icon}</span> {title}
       </div>
       {children}
@@ -96,72 +108,37 @@ function CardSection({ icon, title, tc, children }: { icon: string; title: strin
   );
 }
 
-function BiodataCard({ data, theme }: { data: any; theme: string }) {
+function BiodataCard({ data, theme }: { data: BiodataData; theme: ThemeKey }) {
   const tc = THEMES[theme];
   const corners = [{ top: 10, left: 10 }, { top: 10, right: 10 }, { bottom: 10, left: 10 }, { bottom: 10, right: 10 }];
   return (
-    <div style={{
-      width: "100%", maxWidth: "640px",
-      background: tc.bg, borderRadius: "18px",
-      border: "2.5px solid " + tc.border, boxShadow: tc.cardShadow,
-      fontFamily: "Georgia, 'Times New Roman', serif",
-      overflow: "hidden", position: "relative",
-    }}>
-      <div style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        backgroundImage: "radial-gradient(" + tc.pattern + " 1.5px, transparent 1.5px)",
-        backgroundSize: "22px 22px",
-      }} />
+    <div style={{ width: "100%", maxWidth: "640px", background: tc.bg, borderRadius: "18px", border: "2.5px solid " + tc.border, boxShadow: tc.cardShadow, fontFamily: "Georgia, 'Times New Roman', serif", overflow: "hidden", position: "relative" }}>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "radial-gradient(" + tc.pattern + " 1.5px, transparent 1.5px)", backgroundSize: "22px 22px" }} />
       {corners.map((s, i) => (
-        <div key={i} style={{ position: "absolute", fontSize: "20px", color: tc.border, opacity: 0.6, ...s }}>
-          {tc.ornament}
-        </div>
+        <div key={i} style={{ position: "absolute", fontSize: "20px", color: tc.border, opacity: 0.6, ...s }}>{tc.ornament}</div>
       ))}
-
       <div style={{ position: "relative", padding: "24px" }}>
         {/* Header */}
-        <div style={{
-          background: tc.headerGrad, borderRadius: "14px", padding: "18px 24px",
-          textAlign: "center", marginBottom: "20px", boxShadow: "0 6px 24px " + tc.accent + "40",
-        }}>
-          <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "11px", letterSpacing: "0.35em", marginBottom: "5px" }}>
-            Om Shri Ganeshay Namah
-          </div>
-          <div style={{ color: "white", fontSize: "24px", fontWeight: "bold", letterSpacing: "0.08em", textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
-            विवाह परिचय पत्र
-          </div>
-          <div style={{ color: "white", fontSize: "13px", letterSpacing: "0.25em", marginTop: "2px", opacity: 0.85 }}>
-            MARRIAGE BIODATA
-          </div>
-          <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "14px", marginTop: "8px" }}>
-            {tc.ornament} {tc.ornament} {tc.ornament}
-          </div>
+        <div style={{ background: tc.headerGrad, borderRadius: "14px", padding: "18px 24px", textAlign: "center", marginBottom: "20px", boxShadow: "0 6px 24px " + tc.accent + "40" }}>
+          <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "11px", letterSpacing: "0.35em", marginBottom: "5px" }}>Om Shri Ganeshay Namah</div>
+          <div style={{ color: "white", fontSize: "24px", fontWeight: "bold", letterSpacing: "0.08em", textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>विवाह परिचय पत्र</div>
+          <div style={{ color: "white", fontSize: "13px", letterSpacing: "0.25em", marginTop: "2px", opacity: 0.85 }}>MARRIAGE BIODATA</div>
+          <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "14px", marginTop: "8px" }}>{tc.ornament} {tc.ornament} {tc.ornament}</div>
         </div>
 
         {/* Photo + Highlights */}
         <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
-          <div style={{
-            width: "115px", height: "140px", borderRadius: "12px",
-            border: "3px solid " + tc.border, overflow: "hidden", flexShrink: 0,
-            background: tc.accentSoft, display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
+          <div style={{ width: "115px", height: "140px", borderRadius: "12px", border: "3px solid " + tc.border, overflow: "hidden", flexShrink: 0, background: tc.accentSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>
             {data.photo
               ? <img src={data.photo} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : <div style={{ textAlign: "center", color: tc.sub, padding: "8px" }}>
-                  <div style={{ fontSize: "36px", marginBottom: "4px" }}>🧕</div>
-                  <div style={{ fontSize: "9px" }}>Your Photo</div>
-                </div>
+              : <div style={{ textAlign: "center", color: tc.sub, padding: "8px" }}><div style={{ fontSize: "36px", marginBottom: "4px" }}>🧕</div><div style={{ fontSize: "9px" }}>Your Photo</div></div>
             }
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ color: tc.accent, fontSize: "20px", fontWeight: "bold", marginBottom: "3px" }}>
-              {data.name || "Your Name"}
-            </div>
-            <div style={{ color: tc.sub, fontSize: "11px", marginBottom: "12px", fontStyle: "italic" }}>
-              {data.occupation}{data.company ? " · " + data.company : ""}
-            </div>
+            <div style={{ color: tc.accent, fontSize: "20px", fontWeight: "bold", marginBottom: "3px" }}>{data.name || "Your Name"}</div>
+            <div style={{ color: tc.sub, fontSize: "11px", marginBottom: "12px", fontStyle: "italic" }}>{data.occupation}{data.company ? " · " + data.company : ""}</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-              {[["Age", calcAge(data.dob)], ["Height", data.height], ["Religion / Caste", data.religion + (data.caste ? " · " + data.caste : "")], ["Blood Group", data.bloodGroup]].map(function(item) {
+              {([["Age", calcAge(data.dob)], ["Height", data.height], ["Religion / Caste", data.religion + (data.caste ? " · " + data.caste : "")], ["Blood Group", data.bloodGroup]] as [string, string][]).map(function(item) {
                 return (
                   <div key={item[0]} style={{ background: "rgba(255,255,255,0.7)", border: "1px solid " + tc.border, borderRadius: "8px", padding: "6px 9px" }}>
                     <div style={{ color: tc.label, fontSize: "9px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>{item[0]}</div>
@@ -186,7 +163,6 @@ function BiodataCard({ data, theme }: { data: any; theme: string }) {
             <Row label="Religion" value={data.religion} tc={tc} />
             <Row label="Caste" value={data.caste} tc={tc} />
           </CardSection>
-
           <CardSection icon="👨‍👩‍👧" title="Family Details" tc={tc}>
             <Row label="Father's Name" value={data.fatherName} tc={tc} />
             <Row label="Father's Occ." value={data.fatherOcc} tc={tc} />
@@ -220,9 +196,7 @@ function BiodataCard({ data, theme }: { data: any; theme: string }) {
         </CardSection>
 
         <div style={{ background: tc.headerGrad, borderRadius: "12px", padding: "14px 20px", marginTop: "4px" }}>
-          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "9px", textAlign: "center", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "10px" }}>
-            Contact Details
-          </div>
+          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "9px", textAlign: "center", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "10px" }}>Contact Details</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" }}>
             {data.phone && <div style={{ color: "white", fontSize: "10.5px", display: "flex", gap: "5px" }}><span>📞</span><span>{data.phone}</span></div>}
             {data.email && <div style={{ color: "white", fontSize: "10.5px", display: "flex", gap: "5px" }}><span>✉️</span><span>{data.email}</span></div>}
@@ -230,26 +204,17 @@ function BiodataCard({ data, theme }: { data: any; theme: string }) {
           </div>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "14px", color: tc.border, opacity: 0.7, fontSize: "15px" }}>
-          {tc.ornament} {tc.ornament} {tc.ornament}
-        </div>
+        <div style={{ textAlign: "center", marginTop: "14px", color: tc.border, opacity: 0.7, fontSize: "15px" }}>{tc.ornament} {tc.ornament} {tc.ornament}</div>
       </div>
     </div>
   );
 }
 
-function Field({ label, name, value, onChange, type, options, placeholder }: { label: string; name: string; value: string; onChange: (k: string, v: string) => void; type?: string; options?: string[]; placeholder?: string }) {
-  const inputStyle = {
-    width: "100%", padding: "8px 11px", fontSize: "13px",
-    border: "1.5px solid #e5d5d0", borderRadius: "8px",
-    background: "#fffaf9", color: "#2d1008", outline: "none",
-    fontFamily: "Georgia, serif", boxSizing: "border-box",
-  };
+function Field({ label, name, value, onChange, type, options, placeholder }: { label: string; name: keyof BiodataData; value: string; onChange: (k: keyof BiodataData, v: string) => void; type?: string; options?: string[]; placeholder?: string }) {
+  const inputStyle: React.CSSProperties = { width: "100%", padding: "8px 11px", fontSize: "13px", border: "1.5px solid #e5d5d0", borderRadius: "8px", background: "#fffaf9", color: "#2d1008", outline: "none", fontFamily: "Georgia, serif", boxSizing: "border-box" };
   return (
     <div style={{ marginBottom: "12px" }}>
-      <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#8b4513", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-        {label}
-      </label>
+      <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#8b4513", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</label>
       {options ? (
         <select value={value} onChange={function(e) { onChange(name, e.target.value); }} style={inputStyle}>
           {options.map(function(o) { return <option key={o}>{o}</option>; })}
@@ -264,13 +229,7 @@ function Field({ label, name, value, onChange, type, options, placeholder }: { l
 function FormSection({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: "20px" }}>
-      <div style={{
-        display: "flex", alignItems: "center", gap: "7px",
-        fontSize: "11px", fontWeight: 800, color: "#c2185b",
-        textTransform: "uppercase", letterSpacing: "0.15em",
-        paddingBottom: "8px", marginBottom: "12px",
-        borderBottom: "1.5px dashed #f9a8b8",
-      }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "7px", fontSize: "11px", fontWeight: 800, color: "#c2185b", textTransform: "uppercase", letterSpacing: "0.15em", paddingBottom: "8px", marginBottom: "12px", borderBottom: "1.5px dashed #f9a8b8" }}>
         <span style={{ fontSize: "14px" }}>{icon}</span> {title}
       </div>
       {children}
@@ -279,21 +238,21 @@ function FormSection({ title, icon, children }: { title: string; icon: string; c
 }
 
 export default function App() {
-  const [data, setData] = useState(defaultData);
-  const [theme, setTheme] = useState("rose");
+  const [data, setData] = useState<BiodataData>(defaultData);
+  const [theme, setTheme] = useState<ThemeKey>("rose");
   const [tab, setTab] = useState("preview");
 
-  function set(k, v) { setData(function(prev) { return Object.assign({}, prev, { [k]: v }); }); }
+  function set(k: keyof BiodataData, v: string) { setData(function(prev) { return { ...prev, [k]: v }; }); }
 
-  function handlePhoto(e) {
-    var file = e.target.files && e.target.files[0];
+  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev) { set("photo", ev.target.result); };
+    const reader = new FileReader();
+    reader.onload = function(ev) { set("photo", ev.target?.result as string); };
     reader.readAsDataURL(file);
   }
 
-  var tc = THEMES[theme];
+  const tc = THEMES[theme];
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #fdf6f0 0%, #fce4ec 40%, #f3e5f5 100%)", fontFamily: "Georgia, serif" }}>
@@ -310,35 +269,21 @@ export default function App() {
       {/* Header */}
       <div style={{ background: "linear-gradient(135deg, #880e4f 0%, #c2185b 50%, #ad1457 100%)", padding: "28px 24px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(136,14,79,0.3)" }}>
         <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "11px", letterSpacing: "0.4em", marginBottom: "6px" }}>✦ CREATE YOUR ✦</div>
-        <div style={{ color: "white", fontSize: "32px", fontWeight: 900, letterSpacing: "0.05em", textShadow: "0 3px 12px rgba(0,0,0,0.3)" }}>
-          Marriage Biodata
-        </div>
-        <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "11px", marginTop: "6px", letterSpacing: "0.15em" }}>
-          Fill · Preview · Download as JPG or PDF
-        </div>
+        <div style={{ color: "white", fontSize: "32px", fontWeight: 900, letterSpacing: "0.05em", textShadow: "0 3px 12px rgba(0,0,0,0.3)" }}>Marriage Biodata</div>
+        <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "11px", marginTop: "6px", letterSpacing: "0.15em" }}>Fill · Preview · Download as JPG or PDF</div>
         <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "14px", flexWrap: "wrap" }}>
-          {Object.keys(THEMES).map(function(key) {
-            var t = THEMES[key];
+          {(Object.keys(THEMES) as ThemeKey[]).map(function(key) {
             return (
-              <button key={key} onClick={function() { setTheme(key); }} style={{
-                padding: "6px 14px", borderRadius: "20px",
-                border: "2px solid " + (theme === key ? "white" : "rgba(255,255,255,0.35)"),
-                fontSize: "11px", fontWeight: 700, cursor: "pointer",
-                background: theme === key ? "white" : "transparent",
-                color: theme === key ? "#c2185b" : "rgba(255,255,255,0.85)",
-              }}>{t.name}</button>
+              <button key={key} onClick={function() { setTheme(key); }} style={{ padding: "6px 14px", borderRadius: "20px", border: "2px solid " + (theme === key ? "white" : "rgba(255,255,255,0.35)"), fontSize: "11px", fontWeight: 700, cursor: "pointer", background: theme === key ? "white" : "transparent", color: theme === key ? "#c2185b" : "rgba(255,255,255,0.85)" }}>
+                {THEMES[key].name}
+              </button>
             );
           })}
         </div>
-        <div className="hide-desktop" style={{ gap: "0", justifyContent: "center", marginTop: "14px", background: "rgba(255,255,255,0.15)", borderRadius: "10px", padding: "3px", maxWidth: "260px", margin: "14px auto 0" }}>
+        <div className="hide-desktop" style={{ gap: "0", justifyContent: "center", background: "rgba(255,255,255,0.15)", borderRadius: "10px", padding: "3px", maxWidth: "260px", margin: "14px auto 0" }}>
           {["form", "preview"].map(function(t) {
             return (
-              <button key={t} onClick={function() { setTab(t); }} style={{
-                flex: 1, padding: "8px 16px", borderRadius: "8px", border: "none", cursor: "pointer",
-                fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em",
-                background: tab === t ? "white" : "transparent",
-                color: tab === t ? "#c2185b" : "rgba(255,255,255,0.75)",
-              }}>
+              <button key={t} onClick={function() { setTab(t); }} style={{ flex: 1, padding: "8px 16px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", background: tab === t ? "white" : "transparent", color: tab === t ? "#c2185b" : "rgba(255,255,255,0.75)" }}>
                 {t === "form" ? "✏️ Edit" : "👁️ Preview"}
               </button>
             );
@@ -349,18 +294,13 @@ export default function App() {
       <div style={{ display: "flex", gap: "24px", maxWidth: "1300px", margin: "0 auto", padding: "28px 20px", alignItems: "flex-start" }}>
 
         {/* FORM PANEL */}
-        <div className="form-panel" style={{
-          width: "400px", flexShrink: 0, background: "white", borderRadius: "18px",
-          boxShadow: "0 8px 40px rgba(194,24,91,0.10)", border: "1.5px solid #fce4ec",
-          maxHeight: "calc(100vh - 40px)", overflowY: "auto", padding: "24px",
-          display: tab === "preview" ? "none" : "block",
-        }}>
+        <div className="form-panel" style={{ width: "400px", flexShrink: 0, background: "white", borderRadius: "18px", boxShadow: "0 8px 40px rgba(194,24,91,0.10)", border: "1.5px solid #fce4ec", maxHeight: "calc(100vh - 40px)", overflowY: "auto", padding: "24px", display: tab === "preview" ? "none" : "block" }}>
           <div style={{ fontSize: "16px", fontWeight: 700, color: "#880e4f", marginBottom: "20px" }}>✏️ Edit Your Details</div>
 
           <FormSection title="Photo Upload" icon="🖼️">
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
               <div style={{ width: "72px", height: "72px", borderRadius: "50%", border: "2.5px solid #f48fb1", overflow: "hidden", background: "#fce4ec", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {data.photo ? <img src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "28px" }}>👤</span>}
+                {data.photo ? <img src={data.photo} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "28px" }}>👤</span>}
               </div>
               <label style={{ cursor: "pointer", fontSize: "12px", fontWeight: 700, background: "#fce4ec", color: "#c2185b", border: "1.5px solid #f48fb1", padding: "8px 16px", borderRadius: "8px" }}>
                 Choose Photo
@@ -414,21 +354,13 @@ export default function App() {
             <Field label="Languages Known" name="languages" value={data.languages} onChange={set} />
             <Field label="Hobbies & Interests" name="hobbies" value={data.hobbies} onChange={set} />
             <div style={{ marginBottom: "12px" }}>
-              <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#8b4513", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                📝 Personal Note
-              </label>
+              <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#8b4513", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>📝 Personal Note</label>
               <textarea
                 value={data.note}
                 onChange={function(e) { set("note", e.target.value); }}
-                placeholder="Write a short note about yourself, your values, what makes you unique..."
+                placeholder="Write a short note about yourself..."
                 rows={5}
-                style={{
-                  width: "100%", padding: "8px 11px", fontSize: "13px",
-                  border: "1.5px solid #e5d5d0", borderRadius: "8px",
-                  background: "#fffaf9", color: "#2d1008", outline: "none",
-                  fontFamily: "Georgia, serif", boxSizing: "border-box",
-                  resize: "vertical", lineHeight: "1.6",
-                }}
+                style={{ width: "100%", padding: "8px 11px", fontSize: "13px", border: "1.5px solid #e5d5d0", borderRadius: "8px", background: "#fffaf9", color: "#2d1008", outline: "none", fontFamily: "Georgia, serif", boxSizing: "border-box", resize: "vertical", lineHeight: "1.6" }}
               />
             </div>
           </FormSection>
@@ -436,20 +368,13 @@ export default function App() {
 
         {/* CARD PREVIEW */}
         <div className="card-panel" style={{ flex: 1, flexDirection: "column", alignItems: "center", gap: "16px", display: tab === "form" ? "none" : "flex" }}>
-          <div style={{ textAlign: "center", color: "#8b4513", fontSize: "12px", letterSpacing: "0.08em", opacity: 0.7 }}>
-            Live preview — updates as you type
-          </div>
+          <div style={{ textAlign: "center", color: "#8b4513", fontSize: "12px", opacity: 0.7 }}>Live preview — updates as you type</div>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center", alignItems: "center" }}>
             {["🖼️ Download JPG", "📄 Download PDF"].map(function(label, i) {
               return (
-                <button key={i} style={{
-                  padding: "11px 22px", background: tc.headerGrad, color: "white",
-                  border: "none", borderRadius: "30px", fontSize: "13px", fontWeight: 700,
-                  cursor: "pointer", boxShadow: "0 4px 16px " + tc.accent + "40",
-                }}>{label}</button>
+                <button key={i} style={{ padding: "11px 22px", background: tc.headerGrad, color: "white", border: "none", borderRadius: "30px", fontSize: "13px", fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 16px " + tc.accent + "40" }}>{label}</button>
               );
             })}
-            <span style={{ fontSize: "10px", color: "#aaa", fontStyle: "italic" }}>Downloads active in Vercel app</span>
           </div>
           <BiodataCard data={data} theme={theme} />
         </div>
