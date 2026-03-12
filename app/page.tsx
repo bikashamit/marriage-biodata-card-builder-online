@@ -57,13 +57,13 @@ const defaultData = {
   note: "I am a simple, family-oriented person who values tradition and togetherness. Looking forward to beginning a beautiful journey with the right partner.",
 };
 
-function formatDate(d) {
+function formatDate(d: string) {
   if (!d) return "";
   try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }); }
   catch (e) { return d; }
 }
 
-function calcAge(d) {
+function calcAge(d: string) {
   if (!d) return "";
   return Math.floor((Date.now() - new Date(d)) / (365.25 * 24 * 3600 * 1000)) + " Yrs";
 }
