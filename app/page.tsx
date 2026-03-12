@@ -65,10 +65,10 @@ function formatDate(d: string) {
 
 function calcAge(d: string) {
   if (!d) return "";
-  return Math.floor((Date.now() - new Date(d)) / (365.25 * 24 * 3600 * 1000)) + " Yrs";
+  return Math.floor((Date.now() - new Date(d).getTime()) / (365.25 * 24 * 3600 * 1000)) + " Yrs";
 }
 
-function Row({ label, value, tc }) {
+function Row({ label, value, tc }: { label: string; value: string; tc: any }) {
   return (
     <div style={{ display: "flex", marginBottom: "5px", lineHeight: "1.5" }}>
       <span style={{ color: tc.label, fontWeight: 700, fontSize: "10.5px", minWidth: "120px", flexShrink: 0 }}>{label}</span>
@@ -77,7 +77,7 @@ function Row({ label, value, tc }) {
   );
 }
 
-function CardSection({ icon, title, tc, children }) {
+function CardSection({ icon, title, tc, children }: { icon: string; title: string; tc: any; children: React.ReactNode }) {
   return (
     <div style={{
       background: tc.sectionBg, border: "1px solid " + tc.border,
@@ -96,7 +96,7 @@ function CardSection({ icon, title, tc, children }) {
   );
 }
 
-function BiodataCard({ data, theme }) {
+function BiodataCard({ data, theme }: { data: any; theme: string }) {
   const tc = THEMES[theme];
   const corners = [{ top: 10, left: 10 }, { top: 10, right: 10 }, { bottom: 10, left: 10 }, { bottom: 10, right: 10 }];
   return (
@@ -238,7 +238,7 @@ function BiodataCard({ data, theme }) {
   );
 }
 
-function Field({ label, name, value, onChange, type, options, placeholder }) {
+function Field({ label, name, value, onChange, type, options, placeholder }: { label: string; name: string; value: string; onChange: (k: string, v: string) => void; type?: string; options?: string[]; placeholder?: string }) {
   const inputStyle = {
     width: "100%", padding: "8px 11px", fontSize: "13px",
     border: "1.5px solid #e5d5d0", borderRadius: "8px",
@@ -261,7 +261,7 @@ function Field({ label, name, value, onChange, type, options, placeholder }) {
   );
 }
 
-function FormSection({ title, icon, children }) {
+function FormSection({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: "20px" }}>
       <div style={{
